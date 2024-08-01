@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación: El Estudio de las Ciencias Naturales</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .quiz-container {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #results {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Evaluación: El Estudio de las Ciencias Naturales</h1>
+    <div class="quiz-container">
+        <div id="quiz"></div>
+        <button id="submit">Enviar respuestas</button>
+        <div id="results"></div>
+    </div>
+    <footer>
+        &copy; derechos reservados Prof. Alberto Sanchez
+    </footer>
+    <script>
+        const quizData = [
+            {
+                question: "¿Qué es el método científico?",
+                answers: [
+                    { text: "Un enfoque sistemático para la investigación y la adquisición de conocimiento.", correct: true },
+                    { text: "Una técnica para medir fenómenos naturales.", correct: false },
+                    { text: "Un conjunto de leyes físicas.", correct: false }
+                ]
+            },
+            {
+                question: "¿Cuál es el primer paso del método científico?",
+                answers: [
+                    { text: "Formulación de hipótesis.", correct: false },
+                    { text: "Observación.", correct: true },
+                    { text: "Experimentación.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una hipótesis?",
+                answers: [
+                    { text: "Una suposición que se puede probar.", correct: true },
+                    { text: "Una ley natural.", correct: false },
+                    { text: "Un experimento fallido.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una teoría científica?",
+                answers: [
+                    { text: "Una explicación bien fundamentada de algún aspecto del mundo natural.", correct: true },
+                    { text: "Una suposición sin pruebas.", correct: false },
+                    { text: "Un conjunto de datos experimentales.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un experimento controlado?",
+                answers: [
+                    { text: "Un experimento en el que se manipula una variable para observar sus efectos.", correct: true },
+                    { text: "Un experimento que siempre da resultados positivos.", correct: false },
+                    { text: "Un experimento sin variables.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una variable independiente?",
+                answers: [
+                    { text: "La variable que se manipula en un experimento.", correct: true },
+                    { text: "La variable que se mide en un experimento.", correct: false },
+                    { text: "La variable que no cambia en un experimento.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una variable dependiente?",
+                answers: [
+                    { text: "La variable que se mide en un experimento.", correct: true },
+                    { text: "La variable que se manipula en un experimento.", correct: false },
+                    { text: "La variable que no cambia en un experimento.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una ley científica?",
+                answers: [
+                    { text: "Una descripción de un fenómeno natural que siempre ocurre bajo ciertas condiciones.", correct: true },
+                    { text: "Una explicación de por qué ocurre un fenómeno natural.", correct: false },
+                    { text: "Una suposición que necesita ser probada.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una observación cualitativa?",
+                answers: [
+                    { text: "Una observación que describe cualidades o características sin usar números.", correct: true },
+                    { text: "Una observación que usa números y medidas.", correct: false },
+                    { text: "Una observación que se realiza con un microscopio.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una observación cuantitativa?",
+                answers: [
+                    { text: "Una observación que usa números y medidas.", correct: true },
+                    { text: "Una observación que describe cualidades o características.", correct: false },
+                    { text: "Una observación que se realiza sin instrumentos.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un modelo científico?",
+                answers: [
+                    { text: "Una representación simplificada de un fenómeno o sistema real.", correct: true },
+                    { text: "Un experimento fallido.", correct: false },
+                    { text: "Un instrumento de medida.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una hipótesis nula?",
+                answers: [
+                    { text: "Una hipótesis que propone que no hay efecto o relación entre variables.", correct: true },
+                    { text: "Una hipótesis que siempre es cierta.", correct: false },
+                    { text: "Una hipótesis que no se puede probar.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un experimento de doble ciego?",
+                answers: [
+                    { text: "Un experimento en el que ni los participantes ni los investigadores saben quién recibe el tratamiento.", correct: true },
+                    { text: "Un experimento en el que solo los investigadores saben quién recibe el tratamiento.", correct: false },
+                    { text: "Un experimento sin grupo control.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la replicación en la investigación científica?",
+                answers: [
+                    { text: "La repetición de un experimento para verificar los resultados.", correct: true },
+                    { text: "La creación de múltiples hipótesis.", correct: false },
+                    { text: "La publicación de los resultados.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un sesgo en la investigación científica?",
+                answers: [
+                    { text: "Una inclinación o preferencia que puede afectar los resultados.", correct: true },
+                    { text: "Un tipo de error de medición.", correct: false },
+                    { text: "Un resultado inesperado.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la revisión por pares?",
+                answers: [
+                    { text: "La evaluación de la investigación por otros expertos en el campo.", correct: true },
+                    { text: "La publicación de resultados en un diario.", correct: false },
+                    { text: "La repetición de un experimento por el mismo investigador.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un control positivo en un experimento?",
+                answers: [
+                    { text: "Un grupo en el que se espera un resultado positivo para comparar.", correct: true },
+                    { text: "Un grupo sin tratamiento.", correct: false },
+                    { text: "Un grupo en el que se espera un resultado negativo.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un control negativo en un experimento?",
+                answers: [
+                    { text: "Un grupo en el que no se espera ningún efecto para comparar.", correct: true },
+                    { text: "Un grupo sin tratamiento.", correct: false },
+                    { text: "Un grupo en el que se espera un resultado positivo.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la inferencia?",
+                answers: [
+                    { text: "Una conclusión basada en evidencia y razonamiento.", correct: true },
+                    { text: "Una observación directa.", correct: false },
+                    { text: "Una hipótesis sin pruebas.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un ensayo clínico?",
+                answers: [
+                    { text: "Una investigación experimental en humanos para evaluar tratamientos médicos.", correct: true },
+                    { text: "Un estudio de observación en humanos.", correct: false },
+                    { text: "Un experimento en animales.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una muestra representativa?",
+                answers: [
+                    { text: "Un subconjunto de una población que refleja las características de la población completa.", correct: true },
+                    { text: "Un subconjunto de una población seleccionado al azar.", correct: false },
+                    { text: "Un grupo control en un experimento.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una correlación?",
+                answers: [
+                    { text: "Una relación entre dos variables donde si una cambia, la otra también lo hace.", correct: true },
+                    { text: "Una causa y efecto.", correct: false },
+                    { text: "Una medición de exactitud.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un ensayo doble ciego?",
+                answers: [
+                    { text: "Un experimento en el que ni el sujeto ni el investigador saben quién recibe el tratamiento.", correct: true },
+                    { text: "Un experimento en el que solo el investigador sabe quién recibe el tratamiento.", correct: false },
+                    { text: "Un experimento sin grupo control.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una prueba t?",
+                answers: [
+                    { text: "Una prueba estadística para comparar las medias de dos grupos.", correct: true },
+                    { text: "Una técnica de observación.", correct: false },
+                    { text: "Un método para recolectar datos.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es la falsabilidad?",
+                answers: [
+                    { text: "La capacidad de una hipótesis para ser probada como falsa.", correct: true },
+                    { text: "La capacidad de una teoría para ser siempre verdadera.", correct: false },
+                    { text: "La capacidad de un experimento para ser replicado.", correct: false }
+                ]
+            }
+        ];
+
+        let attempt = 0;
+        const maxAttempts = 3;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadQuiz() {
+            const quizContainer = document.getElementById('quiz');
+            quizContainer.innerHTML = '';
+            quizData.forEach((data, index) => {
+                const questionContainer = document.createElement('div');
+                questionContainer.className = 'question';
+
+                const questionTitle = document.createElement('h3');
+                questionTitle.innerText = `${index + 1}. ${data.question}`;
+                questionContainer.appendChild(questionTitle);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options';
+
+                shuffle(data.answers).forEach(answer => {
+                    const option = document.createElement('li');
+                    const optionLabel = document.createElement('label');
+                    const optionInput = document.createElement('input');
+                    optionInput.type = 'radio';
+                    optionInput.name = `question${index}`;
+                    optionInput.value = answer.correct;
+                    optionLabel.appendChild(optionInput);
+                    optionLabel.appendChild(document.createTextNode(answer.text));
+                    option.appendChild(optionLabel);
+                    optionsList.appendChild(option);
+                });
+
+                questionContainer.appendChild(optionsList);
+                quizContainer.appendChild(questionContainer);
+            });
+        }
+
+        function submitQuiz() {
+            if (attempt >= maxAttempts) {
+                alert('Has alcanzado el número máximo de intentos.');
+                return;
+            }
+
+            const resultsContainer = document.getElementById('results');
+            const answers = document.querySelectorAll('input[type="radio"]:checked');
+            let score = 0;
+
+            quizData.forEach((data, index) => {
+                const selected = answers[index] ? answers[index].value === 'true' : null;
+                if (selected === true) {
+                    score += 0.4; // Each correct answer is worth 0.4 points
+                }
+            });
+
+            score = Math.round(score * 10) / 10; // Round to one decimal place
+            let feedback = quizData.map((data, index) => {
+                const selected = answers[index] ? answers[index].value === 'true' : null;
+                let result;
+                if (selected === null) {
+                    result = "No contestada";
+                } else if (selected === true) {
+                    result = "Correcta";
+                } else {
+                    result = "Incorrecta";
+                }
+                return `<p>${index + 1}. ${result}</p>`;
+            }).join("");
+
+            resultsContainer.innerHTML = `<h3>Resultados:</h3><p>Puntaje: ${score} / 10</p>${feedback}`;
+
+            attempt++;
+            if (attempt >= maxAttempts) {
+                alert('Has alcanzado el número máximo de intentos.');
+            }
+        }
+
+        document.getElementById('submit').addEventListener('click', submitQuiz);
+
+        loadQuiz();
+    </script>
+</body>
+</html>
