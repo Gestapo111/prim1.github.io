@@ -303,35 +303,28 @@
                 return;
             }
 
-            const resultsContainer = document.getElementById('results');
             const answers = document.querySelectorAll('input[type="radio"]:checked');
-            let score = 0;
+            let correctAnswers = [];
 
-            // Shuffle questions again for results
-            const shuffledQuizData = shuffle([...quizData]);
-
-            shuffledQuizData.forEach((data, index) => {
+            quizData.forEach((data, index) => {
                 const selected = answers[index] ? answers[index].value === 'true' : null;
                 if (selected === true) {
-                    score += 0.4; // Cada respuesta correcta vale 0.4 puntos
+                    correctAnswers.push(`${index + 1}. ${data.question}`);
                 }
             });
 
-            score = Math.round(score * 10) / 10; // Redondear a un decimal
-            let feedback = shuffledQuizData.map((data, index) => {
-                const selected = answers[index] ? answers[index].value === 'true' : null;
-                let result;
-                if (selected === null) {
-                    result = "No contestada";
-                } else if (selected === true) {
-                    result = "Correcta";
-                } else {
-                    result = "Incorrecta";
-                }
-                return `<p>${index + 1}. ${result}</p>`;
-            }).join("");
-
-            resultsContainer.innerHTML = `<h3>Resultados:</h3><p>Nombre: ${fullname}</p><p>NIE: ${nie}</p><p>Evaluación: ${evaluationName}</p><p>Puntaje: ${score} / 10</p>${feedback}`;
+            // Open a new window with results
+            const resultWindow = window.open("", "Resultados", "width=600,height=400");
+            resultWindow.document.write("<html><head><title>Resultados</title></head><body>");
+            resultWindow.document.write(`<h2>${evaluationName}</h2>`);
+            resultWindow.document.write(`<p><strong>Nombre:</strong> ${fullname}</p>`);
+            resultWindow.document.write(`<p><strong>NIE:</strong> ${nie}</p>`);
+            resultWindow.document.write("<h3>Respuestas correctas:</h3>");
+            correctAnswers.forEach(answer => {
+                resultWindow.document.write(`<p>${answer}</p>`);
+            });
+            resultWindow.document.write("</body></html>");
+            resultWindow.document.close();
 
             attempt++;
             if (attempt >= maxAttempts) {
