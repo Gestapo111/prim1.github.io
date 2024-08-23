@@ -162,6 +162,8 @@
             <p id="modalDetails"></p>
             <h3>Intentos de manipulación detectados:</h3>
             <p id="manipulationCount"></p>
+            <h3>Reintentos:</h3>
+            <p id="attemptCount"></p>
         </div>
     </div>
 
@@ -415,6 +417,9 @@
 
             // Mostrar intentos de manipulación
             document.getElementById('manipulationCount').innerText = `Intentos de manipulación detectados: ${manipulationCount}`;
+
+            // Mostrar contador de reintentos
+            document.getElementById('attemptCount').innerText = `Reintentos: ${attempt + 1}`;
 
             const modal = document.getElementById('resultModal');
             modal.style.display = 'block';
