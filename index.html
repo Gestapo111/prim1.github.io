@@ -138,10 +138,30 @@
             <p id="modalNIE"></p>
             <h3>Respuestas correctas:</h3>
             <div id="modalAnswers"></div>
+            <h3>Registro de Minimización:</h3>
+            <div id="focusLog"></div>
         </div>
     </div>
 
     <script>
+        // Inicializamos las variables para contar y registrar los tiempos
+        let minimizationCount = 0;
+        let focusLog = [];
+        let startTime;
+
+        // Evento que se dispara cuando cambia la visibilidad de la página
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                minimizationCount++;
+                startTime = new Date(); // Registramos la hora en que la página fue minimizada
+            } else {
+                const endTime = new Date();
+                const timeDiff = (endTime - startTime) / 1000; // Diferencia en segundos
+                focusLog.push(`Minimización #${minimizationCount}: ${timeDiff.toFixed(2)} segundos`);
+            }
+        });
+
+        // Código del cuestionario
         const quizData = [
             {
                 question: "¿Qué es el método científico?",
@@ -353,7 +373,7 @@
                 }
             });
 
-            // Show modal with results
+            // Mostrar los resultados en el modal
             document.getElementById('modalName').innerText = `Nombre: ${fullname}`;
             document.getElementById('modalNIE').innerText = `NIE: ${nie}`;
             const modalAnswers = document.getElementById('modalAnswers');
@@ -362,6 +382,15 @@
                 const p = document.createElement('p');
                 p.innerText = answer;
                 modalAnswers.appendChild(p);
+            });
+
+            // Mostrar el registro de minimización
+            const focusLogElement = document.getElementById('focusLog');
+            focusLogElement.innerHTML = '';
+            focusLog.forEach(log => {
+                const p = document.createElement('p');
+                p.innerText = log;
+                focusLogElement.appendChild(p);
             });
 
             const modal = document.getElementById('resultModal');
@@ -375,7 +404,7 @@
 
         document.getElementById('submit').addEventListener('click', submitQuiz);
 
-        // Modal close functionality
+        // Funcionalidad de cierre del modal
         const closeModal = document.getElementsByClassName('close')[0];
         closeModal.onclick = function() {
             document.getElementById('resultModal').style.display = 'none';
