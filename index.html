@@ -160,6 +160,8 @@
             <div id="modalIncorrectAnswers"></div>
             <h3>Detalles:</h3>
             <p id="modalDetails"></p>
+            <h3>Intentos de manipulación detectados:</h3>
+            <p id="manipulationCount"></p>
         </div>
     </div>
 
@@ -317,6 +319,7 @@
         let timer;
         let timeLeft = 1800; // 30 minutos en segundos
         let startTime;
+        let manipulationCount = 0;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -410,6 +413,9 @@
                 Calificación: ${((quizData.length - incorrectAnswers.length) / quizData.length * 10).toFixed(2)}/10
             `;
 
+            // Mostrar intentos de manipulación
+            document.getElementById('manipulationCount').innerText = `Intentos de manipulación detectados: ${manipulationCount}`;
+
             const modal = document.getElementById('resultModal');
             modal.style.display = 'block';
 
@@ -449,6 +455,7 @@
 
         document.addEventListener("contextmenu", function(e){
             e.preventDefault();
+            updateCaptureCount();
         }, false);
 
         function startTimer() {
@@ -474,6 +481,31 @@
                 }
             }, 1000);
         }
+
+        function updateCaptureCount() {
+            manipulationCount++;
+        }
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                updateCaptureCount();
+            }
+        });
+
+        window.addEventListener('pagehide', function() {
+            updateCaptureCount();
+        });
+
+        window.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            updateCaptureCount();
+        });
+
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                updateCaptureCount();
+            }
+        });
 
         window.onload = function() {
             document.getElementById('infoModal').style.display = 'block';
