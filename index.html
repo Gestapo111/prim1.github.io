@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación: El Estudio de las Ciencias Naturales</title>
+    <title>Evaluación: Estudio Científico</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,6 +13,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            user-select: none; /* Bloquea selección de texto */
         }
         h1 {
             color: #333;
@@ -25,6 +26,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 80%;
             max-width: 800px;
+            display: none; /* Oculto hasta que se ingrese el NIE válido */
         }
         .question {
             margin-bottom: 15px;
@@ -83,8 +85,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0, 0, 0, 0.4);
             padding-top: 60px;
         }
         .modal-content {
@@ -109,19 +110,22 @@
             text-decoration: none;
             cursor: pointer;
         }
+        /* Cronómetro flotante */
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: green;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
-    <h1>Evaluación: El Estudio de las Ciencias Naturales</h1>
+    <h1>Evaluación: Estudio Científico</h1>
     <div class="quiz-container">
-        <div class="input-field">
-            <label for="fullname">Nombre completo:</label>
-            <input type="text" id="fullname" required>
-        </div>
-        <div class="input-field">
-            <label for="nie">NIE:</label>
-            <input type="text" id="nie" required>
-        </div>
         <div id="quiz"></div>
         <button id="submit">Enviar respuestas</button>
     </div>
@@ -129,69 +133,69 @@
         &copy; Derechos Reservados Prof. Alberto Sanchez
     </footer>
 
-    <!-- Modal -->
-    <div id="resultModal" class="modal">
+    <!-- Modal para solicitar nombre y NIE -->
+    <div id="infoModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Evaluación: El Estudio de las Ciencias Naturales</h2>
-            <p id="modalName"></p>
-            <p id="modalNIE"></p>
-            <h3>Respuestas correctas:</h3>
-            <div id="modalAnswers"></div>
-            <h3>Registro de Minimización:</h3>
-            <div id="focusLog"></div>
+            <h2>Por favor, ingresa tus datos</h2>
+            <div class="input-field">
+                <label for="fullname">Nombre completo:</label>
+                <input type="text" id="fullname" required>
+            </div>
+            <div class="input-field">
+                <label for="nie">NIE:</label>
+                <input type="text" id="nie" required>
+            </div>
+            <button id="startQuiz">Comenzar Evaluación</button>
         </div>
     </div>
 
+    <!-- Modal de resultados -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Resultados de la Evaluación</h2>
+            <p id="modalName"></p>
+            <p id="modalNIE"></p>
+            <h3>Respuestas incorrectas:</h3>
+            <div id="modalIncorrectAnswers"></div>
+            <h3>Detalles:</h3>
+            <p id="modalDetails"></p>
+        </div>
+    </div>
+
+    <div id="timer">30:00</div>
+
     <script>
-        // Inicializamos las variables para contar y registrar los tiempos
-        let minimizationCount = 0;
-        let focusLog = [];
-        let startTime;
-
-        // Evento que se dispara cuando cambia la visibilidad de la página
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                minimizationCount++;
-                startTime = new Date(); // Registramos la hora en que la página fue minimizada
-            } else {
-                const endTime = new Date();
-                const timeDiff = (endTime - startTime) / 1000; // Diferencia en segundos
-                focusLog.push(`Minimización #${minimizationCount}: ${timeDiff.toFixed(2)} segundos`);
-            }
-        });
-
-        // Código del cuestionario
         const quizData = [
             {
-                question: "¿Qué es el método científico?",
+                question: "¿Qué es una observación cuantitativa?",
                 answers: [
-                    { text: "Un enfoque sistemático para la investigación y la adquisición de conocimiento.", correct: true },
-                    { text: "Una técnica para medir fenómenos naturales.", correct: false },
-                    { text: "Un conjunto de leyes físicas.", correct: false }
+                    { text: "Una observación que se realiza sin instrumentos.", correct: false },
+                    { text: "Una observación que usa números y medidas.", correct: true },
+                    { text: "Una observación que describe cualidades o características.", correct: false }
                 ]
             },
             {
-                question: "¿Cuál es el primer paso del método científico?",
+                question: "¿Qué es una hipótesis nula?",
                 answers: [
-                    { text: "Formulación de hipótesis.", correct: false },
-                    { text: "Observación.", correct: true },
-                    { text: "Experimentación.", correct: false }
+                    { text: "Una hipótesis que no se puede probar.", correct: false },
+                    { text: "Una hipótesis que siempre es cierta.", correct: false },
+                    { text: "Una hipótesis que propone que no hay efecto o relación entre variables.", correct: true }
                 ]
             },
             {
-                question: "¿Qué es una hipótesis?",
+                question: "¿Qué es un modelo científico?",
                 answers: [
-                    { text: "Una suposición que se puede probar.", correct: true },
-                    { text: "Una ley natural.", correct: false },
-                    { text: "Un experimento fallido.", correct: false }
+                    { text: "Un instrumento de medida.", correct: false },
+                    { text: "Un experimento fallido.", correct: false },
+                    { text: "Una representación simplificada de un fenómeno o sistema real.", correct: true }
                 ]
             },
             {
                 question: "¿Qué es una teoría científica?",
                 answers: [
-                    { text: "Una explicación bien fundamentada de algún aspecto del mundo natural.", correct: true },
                     { text: "Una suposición sin pruebas.", correct: false },
+                    { text: "Una explicación bien fundamentada de algún aspecto del mundo natural.", correct: true },
                     { text: "Un conjunto de datos experimentales.", correct: false }
                 ]
             },
@@ -199,88 +203,88 @@
                 question: "¿Qué es un experimento controlado?",
                 answers: [
                     { text: "Un experimento en el que se manipula una variable para observar sus efectos.", correct: true },
-                    { text: "Un experimento que siempre da resultados positivos.", correct: false },
-                    { text: "Un experimento sin variables.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es una variable independiente?",
-                answers: [
-                    { text: "La variable que se manipula en un experimento.", correct: true },
-                    { text: "La variable que se mide en un experimento.", correct: false },
-                    { text: "La variable que no cambia en un experimento.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es una variable dependiente?",
-                answers: [
-                    { text: "La variable que se mide en un experimento.", correct: true },
-                    { text: "La variable que se manipula en un experimento.", correct: false },
-                    { text: "La variable que no cambia en un experimento.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es una ley científica?",
-                answers: [
-                    { text: "Una descripción de un fenómeno natural que siempre ocurre bajo ciertas condiciones.", correct: true },
-                    { text: "Una explicación de por qué ocurre un fenómeno natural.", correct: false },
-                    { text: "Una suposición que necesita ser probada.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es una observación cualitativa?",
-                answers: [
-                    { text: "Una observación que describe cualidades o características sin usar números.", correct: true },
-                    { text: "Una observación que usa números y medidas.", correct: false },
-                    { text: "Una observación que se realiza con un microscopio.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es una observación cuantitativa?",
-                answers: [
-                    { text: "Una observación que usa números y medidas.", correct: true },
-                    { text: "Una observación que describe cualidades o características.", correct: false },
-                    { text: "Una observación que se realiza sin instrumentos.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es un modelo científico?",
-                answers: [
-                    { text: "Una representación simplificada de un fenómeno o sistema real.", correct: true },
-                    { text: "Un experimento fallido.", correct: false },
-                    { text: "Un instrumento de medida.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es una hipótesis nula?",
-                answers: [
-                    { text: "Una hipótesis que propone que no hay efecto o relación entre variables.", correct: true },
-                    { text: "Una hipótesis que siempre es cierta.", correct: false },
-                    { text: "Una hipótesis que no se puede probar.", correct: false }
-                ]
-            },
-            {
-                question: "¿Qué es un experimento de doble ciego?",
-                answers: [
-                    { text: "Un experimento en el que ni los participantes ni los investigadores saben quién recibe el tratamiento.", correct: true },
-                    { text: "Un experimento en el que solo los investigadores saben quién recibe el tratamiento.", correct: false },
-                    { text: "Un experimento sin grupo control.", correct: false }
+                    { text: "Un experimento sin variables.", correct: false },
+                    { text: "Un experimento que siempre da resultados positivos.", correct: false }
                 ]
             },
             {
                 question: "¿Qué es la replicación en la investigación científica?",
                 answers: [
                     { text: "La repetición de un experimento para verificar sus resultados.", correct: true },
-                    { text: "La revisión de resultados por otros científicos.", correct: false },
-                    { text: "La presentación de resultados en una conferencia.", correct: false }
+                    { text: "La presentación de resultados en una conferencia.", correct: false },
+                    { text: "La revisión de resultados por otros científicos.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un experimento de doble ciego?",
+                answers: [
+                    { text: "Un experimento sin grupo control.", correct: false },
+                    { text: "Un experimento en el que solo los investigadores saben quién recibe el tratamiento.", correct: false },
+                    { text: "Un experimento en el que ni los participantes ni los investigadores saben quién recibe el tratamiento.", correct: true }
+                ]
+            },
+            {
+                question: "¿Qué es una variable dependiente?",
+                answers: [
+                    { text: "La variable que no cambia en un experimento.", correct: false },
+                    { text: "La variable que se manipula en un experimento.", correct: false },
+                    { text: "La variable que se mide en un experimento.", correct: true }
+                ]
+            },
+            {
+                question: "¿Qué es una observación cualitativa?",
+                answers: [
+                    { text: "Una observación que se realiza con un microscopio.", correct: false },
+                    { text: "Una observación que describe cualidades o características sin usar números.", correct: true },
+                    { text: "Una observación que usa números y medidas.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una hipótesis?",
+                answers: [
+                    { text: "Un experimento fallido.", correct: false },
+                    { text: "Una suposición que se puede probar.", correct: true },
+                    { text: "Una ley natural.", correct: false }
+                ]
+            },
+            {
+                question: "¿Cuál es el primer paso del método científico?",
+                answers: [
+                    { text: "Experimentación.", correct: false },
+                    { text: "Observación.", correct: true },
+                    { text: "Formulación de hipótesis.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es el método científico?",
+                answers: [
+                    { text: "Un conjunto de leyes físicas.", correct: false },
+                    { text: "Un enfoque sistemático para la investigación y la adquisición de conocimiento.", correct: true },
+                    { text: "Una técnica para medir fenómenos naturales.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es un sesgo en la investigación científica?",
+                answers: [
+                    { text: "Una inclinación o preferencia que puede afectar los resultados del estudio.", correct: true },
+                    { text: "Una técnica de análisis de datos.", correct: false },
+                    { text: "Un tipo de experimento.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué es una ley científica?",
+                answers: [
+                    { text: "Una suposición que necesita ser probada.", correct: false },
+                    { text: "Una explicación de por qué ocurre un fenómeno natural.", correct: false },
+                    { text: "Una descripción de un fenómeno natural que siempre ocurre bajo ciertas condiciones.", correct: true }
                 ]
             },
             {
                 question: "¿Qué es un grupo control en un experimento?",
                 answers: [
+                    { text: "Un grupo que se excluye del experimento.", correct: false },
                     { text: "Un grupo que no recibe el tratamiento y sirve para comparar los resultados.", correct: true },
-                    { text: "Un grupo que recibe un tratamiento diferente.", correct: false },
-                    { text: "Un grupo que se excluye del experimento.", correct: false }
+                    { text: "Un grupo que recibe un tratamiento diferente.", correct: false }
                 ]
             },
             {
@@ -292,18 +296,27 @@
                 ]
             },
             {
-                question: "¿Qué es un sesgo en la investigación científica?",
+                question: "¿Qué es una variable independiente?",
                 answers: [
-                    { text: "Una inclinación o preferencia que puede afectar los resultados del estudio.", correct: true },
-                    { text: "Una técnica de análisis de datos.", correct: false },
-                    { text: "Un tipo de experimento.", correct: false }
+                    { text: "La variable que se mide en un experimento.", correct: false },
+                    { text: "La variable que no cambia en un experimento.", correct: false },
+                    { text: "La variable que se manipula en un experimento.", correct: true }
                 ]
             }
         ];
 
+        const authorizedNIEs = [
+            "4839280", "19711634", "4839293", "6297544", "19711644", "3850927",
+            "19711635", "4267835", "3293986", "19711278", "19711637", "4267839",
+            "19806177", "4839298", "4267832", "4267843", "4839279", "4839301", "19964688"
+        ];
+
         let attempt = 0;
-        const maxAttempts = 3;
-        const evaluationName = "Evaluación: El Estudio de las Ciencias Naturales";
+        const maxAttempts = 2;
+        const evaluationName = "Evaluación: Estudio Científico";
+        let timer;
+        let timeLeft = 1800; // 30 minutos en segundos
+        let startTime;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -317,7 +330,7 @@
             const quizContainer = document.getElementById('quiz');
             quizContainer.innerHTML = '';
             
-            // Shuffle questions
+            // Shuffle questions and answers
             const shuffledQuizData = shuffle([...quizData]);
 
             shuffledQuizData.forEach((data, index) => {
@@ -364,34 +377,38 @@
             }
 
             const answers = document.querySelectorAll('input[type="radio"]:checked');
-            let correctAnswers = [];
+            let incorrectAnswers = [];
 
             quizData.forEach((data, index) => {
                 const selected = answers[index] ? answers[index].value === 'true' : null;
-                if (selected === true) {
-                    correctAnswers.push(`${index + 1}. ${data.question}`);
+                if (selected === false || selected === null) {
+                    incorrectAnswers.push(`${index + 1}. ${data.question}`);
                 }
             });
 
             // Mostrar los resultados en el modal
             document.getElementById('modalName').innerText = `Nombre: ${fullname}`;
             document.getElementById('modalNIE').innerText = `NIE: ${nie}`;
-            const modalAnswers = document.getElementById('modalAnswers');
-            modalAnswers.innerHTML = '';
-            correctAnswers.forEach(answer => {
+            const modalIncorrectAnswers = document.getElementById('modalIncorrectAnswers');
+            modalIncorrectAnswers.innerHTML = '';
+            incorrectAnswers.forEach(answer => {
                 const p = document.createElement('p');
                 p.innerText = answer;
-                modalAnswers.appendChild(p);
+                modalIncorrectAnswers.appendChild(p);
             });
 
-            // Mostrar el registro de minimización
-            const focusLogElement = document.getElementById('focusLog');
-            focusLogElement.innerHTML = '';
-            focusLog.forEach(log => {
-                const p = document.createElement('p');
-                p.innerText = log;
-                focusLogElement.appendChild(p);
-            });
+            // Mostrar detalles adicionales
+            const endTime = new Date();
+            const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+            const currentDate = new Date();
+            const modalDetails = document.getElementById('modalDetails');
+            modalDetails.innerHTML = `
+                Fecha: ${currentDate.toLocaleDateString()}<br>
+                Hora: ${currentDate.toLocaleTimeString()}<br>
+                Tiempo en realizar la prueba: ${timeTaken} segundos<br>
+                Nombre de la unidad: ${evaluationName}<br>
+                Calificación: ${((quizData.length - incorrectAnswers.length) / quizData.length * 10).toFixed(2)}/10
+            `;
 
             const modal = document.getElementById('resultModal');
             modal.style.display = 'block';
@@ -399,12 +416,26 @@
             attempt++;
             if (attempt >= maxAttempts) {
                 alert('Has alcanzado el número máximo de intentos.');
+                // Aquí puedes agregar código para bloquear la MAC o deshabilitar la evaluación
             }
         }
 
         document.getElementById('submit').addEventListener('click', submitQuiz);
 
-        // Funcionalidad de cierre del modal
+        document.getElementById('startQuiz').addEventListener('click', function() {
+            const nie = document.getElementById('nie').value.trim();
+            if (!authorizedNIEs.includes(nie)) {
+                alert('NIE no autorizado.');
+                return;
+            }
+            document.querySelector('.quiz-container').style.display = 'block';
+            document.getElementById('infoModal').style.display = 'none';
+            startTime = new Date();
+            startTimer();
+            loadQuiz();
+        });
+
+        // Modal close functionality
         const closeModal = document.getElementsByClassName('close')[0];
         closeModal.onclick = function() {
             document.getElementById('resultModal').style.display = 'none';
@@ -416,7 +447,37 @@
             }
         }
 
-        loadQuiz();
+        document.addEventListener("contextmenu", function(e){
+            e.preventDefault();
+        }, false);
+
+        function startTimer() {
+            timer = setInterval(function() {
+                timeLeft--;
+                const timerElement = document.getElementById('timer');
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                timerElement.innerText = `${minutes}:${seconds}`;
+
+                if (timeLeft <= 600) {
+                    timerElement.style.backgroundColor = 'red';
+                } else if (timeLeft <= 1200) {
+                    timerElement.style.backgroundColor = 'orange';
+                } else {
+                    timerElement.style.backgroundColor = 'green';
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        window.onload = function() {
+            document.getElementById('infoModal').style.display = 'block';
+        }
     </script>
 </body>
 </html>
