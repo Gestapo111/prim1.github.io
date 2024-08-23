@@ -121,6 +121,20 @@
             font-size: 18px;
             border-radius: 5px;
         }
+        /* Estilo para los números de preguntas incorrectas */
+        .incorrect-answers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .incorrect-answers div {
+            width: 18%;
+            text-align: center;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 5px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -156,8 +170,8 @@
             <h2>Resultados de la Evaluación</h2>
             <p id="modalName"></p>
             <p id="modalNIE"></p>
-            <h3>Respuestas incorrectas:</h3>
-            <div id="modalIncorrectAnswers"></div>
+            <h3>Preguntas incorrectas:</h3>
+            <div id="modalIncorrectAnswers" class="incorrect-answers"></div>
             <h3>Detalles:</h3>
             <p id="modalDetails"></p>
             <h3>Intentos de manipulación detectados:</h3>
@@ -309,7 +323,7 @@
             }
         ];
 
-        const authorizedNIEs = [
+       const authorizedNIEs = [
             "4839280", "19711634", "4839293", "6297544", "19711644", "3850927",
             "19711635", "4267835", "3293986", "19711278", "19711637", "4267839",
             "19806177", "4839298", "4267832", "4267843", "4839279", "4839301", "19964688"
@@ -387,7 +401,7 @@
             quizData.forEach((data, index) => {
                 const selected = answers[index] ? answers[index].value === 'true' : null;
                 if (selected === false || selected === null) {
-                    incorrectAnswers.push(`${index + 1}. ${data.question}`);
+                    incorrectAnswers.push(index + 1);
                 }
             });
 
@@ -396,10 +410,10 @@
             document.getElementById('modalNIE').innerText = `NIE: ${nie}`;
             const modalIncorrectAnswers = document.getElementById('modalIncorrectAnswers');
             modalIncorrectAnswers.innerHTML = '';
-            incorrectAnswers.forEach(answer => {
-                const p = document.createElement('p');
-                p.innerText = answer;
-                modalIncorrectAnswers.appendChild(p);
+            incorrectAnswers.forEach((questionNumber, index) => {
+                const div = document.createElement('div');
+                div.innerText = `Pregunta ${questionNumber}`;
+                modalIncorrectAnswers.appendChild(div);
             });
 
             // Mostrar detalles adicionales
